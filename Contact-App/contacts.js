@@ -4,8 +4,6 @@ const readline = require('readline');
 const chalk = require('chalk');
 const validator = require('validator');
 
-
-
 // const rl = readline.createInterface({
 //     input: process.stdin,
 //     output: process.stdout
@@ -31,13 +29,19 @@ if (!fs.existsSync('./data/contacts.json')) {
 //     });
 // }
 
+const loadContact = () => {
+    const file = fs.readFileSync('data/contacts.json', 'utf-8');
+    const contacts = file.length ? JSON.parse(file) : [];
+    return contacts;
+}
+
 const simpanKontak = (nama, email, umur) => {
     const contact = { nama, email, umur };
-    const file = fs.readFileSync('data/contacts.json', 'utf-8');
 
     try {
         // kalo file nya ga kososng, isinya di parsing ke JSON, kalau kosong dikasi array kosong
-        const contacts = file.length ? JSON.parse(file) : [];
+        const contacts = loadContact();
+
 
         // cek duplikat
         const duplikat = contacts.find((contact) => contact.nama == nama)
@@ -52,15 +56,6 @@ const simpanKontak = (nama, email, umur) => {
             return false;
         }
 
-        // cek HP
-        if (!validator.isNumeric(umur)) {
-            console.log(chalk.inverse.red.bold('Format email salah, silahkan masukkan email yang valid.'));
-            return false;
-        }
-
-
-
-
         contacts.push(contact);
 
         fs.writeFileSync('data/contacts.json', JSON.stringify(contacts, null, 2));
@@ -74,4 +69,42 @@ const simpanKontak = (nama, email, umur) => {
     // rl.close()
 }
 
-module.exports = { simpanKontak };
+const lihatKontak = () => {
+    const contacts = loadContact();
+    contacts.forEach((contact, i) => {
+        console.log(`${i + 1}. ${contact.nama} - ${contact.email}`);
+
+    })
+};
+
+const detailKontak = (nama) => {
+    const contacts = loadContact();
+    const contact = contacts.find((contact) => contact.nama.toLowerCase() === nama.toLowerCase())
+    if (!contact) {
+        console.log(chalk.inverse.red.bold(`${nama} tidak ditemukan`));
+        return false;
+    }
+
+
+    console.log(`Nama: ${contact.nama}`);
+    console.log(`Nomor: ${contact.nomor}`);
+    console.log(`Email: ${contact.email}`);
+
+
+}
+
+const hapusKontak = (nama) => {
+    const contacts = loadContact();
+    const newContact = contacts.filter((contact) => contact.nama.toLowerCase() !== nama.toLowerCase())
+    if (contacts.length === newContact.length) {
+        console.log(chalk.inverse.red.bold(`${nama} tidak ditemukan`));
+        return false;
+    }
+
+    fs.writeFileSync('data/contacts.json', JSON.stringify(newContact, null, 2));
+
+    console.log(`Kontak ${nama} berhasil dihapus!`);
+}
+
+
+module.exports = { simpanKontak , lihatKontak , detailKontak , hapusKontak };

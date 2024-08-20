@@ -1,4 +1,4 @@
-const {  simpanKontak } = require('./contacts');
+const {  simpanKontak , lihatKontak ,detailKontak , hapusKontak} = require('./contacts');
 const yargs = require('yargs');
 
 
@@ -13,7 +13,7 @@ const yargs = require('yargs');
 
 // daftarKontak();
 
-
+// tambah kontak
 yargs.command({
     command: 'add',
     describe: 'Tambahkan kontak baru',
@@ -36,6 +36,52 @@ yargs.command({
     },
     handler(argv) {
         simpanKontak(argv.nama, argv.email, argv.umur);
+    }
+}).demandCommand();
+
+
+// lihat list
+yargs
+.command({
+    command: 'list',
+    describe: 'Daftar semua kontak',
+    handler() {
+        lihatKontak();
+    }
+})
+
+// tambah detail
+yargs
+.command({
+    command: 'detail',
+    describe: 'Detail kontak',
+    builder: {
+        nama: {
+            describe: 'Nama kontak',
+            demandOption: true,
+            type: 'string'
+        }
+    },
+    handler(argv) {
+        detailKontak(argv.nama);
+    }
+})
+
+
+// hapus kontak
+yargs
+.command({
+    command: 'remove',
+    describe: 'menghapus kontak',
+    builder: {
+        nama: {
+            describe: 'Nama kontak',
+            demandOption: true,
+            type: 'string'
+        }
+    },
+    handler(argv) {
+        hapusKontak(argv.nama);
     }
 })
 
